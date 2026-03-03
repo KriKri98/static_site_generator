@@ -1,8 +1,8 @@
 import unittest
 
 from textnode import TextNode, TextType, text_node_to_html_node
-from split import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
-
+from split import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes, markdown_to_blocks
+from blocktypes import block_to_block_type, BlockType
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
@@ -131,5 +131,57 @@ class TestSplitImageAndLink(unittest.TestCase):
     TextNode(" and a ", TextType.TEXT),
     TextNode("link", TextType.LINK, "https://boot.dev"),
 ] )
+    def test_markdown_to_blocks(self):
+        md = """
+This is **bolded** paragraph
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+- This is a list
+- with items
+"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "This is **bolded** paragraph",
+                "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+                "- This is a list\n- with items",
+            ],
+        )        
+    
+class TestBlockToBlockType(unittest.TestCase):
+    def test(self):
+        md = """
+# This is a heading paragraph
+
+1. This is another paragraph with _italic_ text and `code` here
+2. This is the same paragraph on a new line
+
+- This is a list
+- with items
+
+> This is a quote
+
+```
+This is Code
+```
+
+I like trains.
+"""
+        blocks = markdown_to_blocks(md)
+        types = []
+        for block in blocks:
+            types.append(block_to_block_type(block))
+        self.assertListEqual(types, [BlockType.HEADING, BlockType.OLIST, BlockType.ULIST, BlockType.QUOTE, BlockType.CODE, BlockType.PARAGRAPH])      
+
+
+
+
+
+
+
+
 if __name__ == "__main__":
     unittest.main()

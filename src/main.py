@@ -1,11 +1,16 @@
 
 import os, shutil
 from gencontent import generate_pages_recursive
+import sys
 
 dir_path_static = "./static/"
-dir_path_public = "./public/"
+dir_path_public = "./docs/"
 dir_path_content = "./content"
 template_path = "./template.html"
+
+base_path = sys.argv[1]
+if base_path == "":
+    base_path = "/"
 
 
 def main():
@@ -17,7 +22,7 @@ def main():
     copy_files_recursive(dir_path_static, dir_path_public)
 
     print("Generating page...")
-    generate_pages_recursive(dir_path_content, template_path, dir_path_public)
+    generate_pages_recursive(dir_path_content, template_path, dir_path_public, base_path)
 
 def copy_files_recursive(source_dir_path, dest_dir_path):
     if not os.path.exists(dest_dir_path):
